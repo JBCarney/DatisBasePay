@@ -1,0 +1,187 @@
+﻿@model DatisBasePay.ViewModels.HomePageViewModel
+
+<h1>@ViewBag.Title</h1>
+<div ng-app="app" ng-controller="EmployeeController as vm" ng-cloak>
+	<div class="container">
+		<form name="employeeForm" novalidate>
+			<!-- ** BEGIN MESSAGE AREA ** -->
+			<div ng-hide="vm.uiState.isValid || (employeeForm.$valid && !employeeForm.$pristine)" class="row">
+				<div class="col-xs-12">
+					<div class="alert alert-danger alert-dismissable" role="alert">
+						<button type="button" class="close" data-dismiss="alert">
+							<span aria-hidden="true">
+								&times;
+							</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<ul>
+							<li ng-repeat="msg in vm.uiState.messages">
+								{{msg.message}}
+							</li>
+							<li ng-show="employeeForm.employeeName.$error.required">
+								Employee name must be filled in.
+							</li>
+							<li ng-show="employeeForm.salary.$error.required">
+								Salary must be greater than 0%.
+							</li>
+							<li ng-show="employeeForm.taxRate.$error.required">
+								Tax Rate must be greater than 0%.
+							</li>
+							<li ng-show="employeeForm.contribution.$error.required">
+								401k Contribution must be  greater than 0%.
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- ** END MESSAGE AREA ** -->
+			<!-- ** BEGIN SEARCH AREA ** -->
+			<div ng-show="vm.uiState.isSearchAreaVisible" class="panel panel-primary">
+				<div class="panel-heading">
+					<h1 class="panel-title">Search for Employees</h1>
+				</div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label for="searchEmployeeName"></label>
+						<input type="text" class="form-control"
+							  ng-model="search.employeeName" />
+					</div>
+				</div>
+				<div class="panel-footer">
+					<button type="button"
+						   class="btn btn-sm btn-success"
+						   ng-click="vm.addClick()">
+						<i class="glyphicon glyphicon-plus"></i>
+						&nbsp;Add Employee
+					</button>
+				</div>
+			</div>
+			<!-- ** END SEARCH AREA ** -->
+			<!-- ** BEGIN DETAIL AREA ** -->
+			<div ng-show="vm.uiState.isDetailAreaVisible" class="panel panel-primary">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						Employee Information
+					</h1>
+				</div>
+				<div class="panel-body">
+					<!-- ** BEGIN INPUT AREA -->
+					<div class="form-group">
+						<label for="employeeName">Employee Name</label>
+						<input id="employeeName"
+							  name="employeeName"
+							  required
+							  type="text"
+							  class="form-control"
+							  ng-minlength="2"
+							  ng-maxlength="150"
+							  ng-model="vm.employee.EmployeeName" />
+					</div>
+					<div class="form-group">
+						<label for="salary">Salary</label>
+						<input id="salary"
+							  name="salary"
+							  required
+							  type="text"
+							  class="form-control"
+							  ng-model="vm.employee.Salary" />
+					</div>
+					<div class="form-group">
+						<label for="taxRate">Tax Rate %</label>
+						<input id="taxRate"
+							  name="taxRate"
+							  required
+							  type="text"
+							  class="form-control"
+							  ng-model="vm.employee.TaxRate" />
+					</div>
+					<div class="form-group">
+						<label for="contribution">401k Contribution %</label>
+						<input id="contribution"
+							  name="contribution"
+							  required
+							  type="text"
+							  class="form-control"
+							  ng-model="vm.employee.Contribution" />
+					</div>
+					<div class="form-group">
+						<label for="stateOfResidence">State of Residence</label>
+						<select id="stateOfResidence" name="stateOfResidence" class="form-control" ng-model="vm.employee.StateOfResidence">
+							<option value="Arizona">Arizona</option>
+							<option value="Florida">Florida</option>
+							<option value="Hawaii">Hawaii</option>
+							<option value="Nevada">Nevada</option>
+							<option value="Virginia">Virginia</option>
+						</select>
+					</div>
+					<!-- ** END INPUT AREA -->
+				</div>
+				<div class="panel-footer">
+					<div class="row">
+						<div class="col-sm-12">
+							<button class="btn btn-sm btn-primary"
+								   type="button"
+								   ng-click="vm.saveClick(employeeForm)">
+								<i class="glyphicon glyphicon-floppy-disk"></i>
+								&nbsp;Save
+							</button>
+							<button class="btn btn-sm btn-primary"
+								   type="button"
+								   ng-click="vm.cancelClick(employeeForm)">
+								<i class="glyphicon glyphicon-remove-circle"></i>
+								&nbsp;Cancel
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- ** END DETAIL AREA ** -->
+			<!-- ** BEGIN LIST AREA ** -->
+			<div ng-show="vm.uiState.isListAreaVisible" class="table-responsive">
+				<table id="productTable" class="table table-condensed table-bordered table-striped table-hover">
+					<thead>
+						<tr>
+							<th class="dbp-action-button-column">
+								Edit
+							</th>
+							<th>Employee Name</th>
+							<th>Salary</th>
+							<th>Tax Rate</th>
+							<th>401k Contribution</th>
+							<th>State of Residence</th>
+							<th>Net Pay</th>
+							<th class="dbp-action-button-column">
+								Delete
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="employee in vm.employees | filter:search">
+							<td class="dbp-action-button-column">
+								<a href="#"
+								   ng-click="vm.editClick(employee.id)"
+								   class="btn btn-default btn-sm">
+									<i class="glyphicon glyphicon-edit"></i>
+								</a>
+							</td>
+							<td>{{employee.employeeName}}</td>
+							<td>{{employee.salary | currency}}</td>
+							<td>{{employee.taxRate | number:0}}%</td>
+							<td>{{employee.contribution | number:0}}%</td>
+							<td>{{employee.stateOfResidence}}</td>
+							<td>{{employee.salary - (((employee.taxRate / 100) * employee.salary) + ((employee.contribution / 100 * employee.salary))) | currency}}</td>
+							<td class="dbp-action-button-column">
+								<a href="#"
+								   ng-click="vm.deleteClick(employee.id)"
+								   class="btn btn-default btn-sm">
+									<i class="glyphicon glyphicon-trash"></i>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<!-- ** END LIST AREA ** -->
+		</form>
+	</div>
+</div>
